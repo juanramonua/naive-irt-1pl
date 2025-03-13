@@ -1,8 +1,47 @@
-# naïve-irt-1pl  
+# Naïve IRT (1PL)
+
 Naïve IRT: A Speed-Optimized and Accurate Alternative to the Rasch Model  
 
-This is a Python program for estimating Item Response Theory (IRT) parameters for a Rasch model (1PL). For synthetic IRT data generation, the [GIRTH](https://eribean.github.io/girth/) package can be used. Additionally, the program's structure and parameters are compatible with the [GIRTH](https://eribean.github.io/girth/) package.  
-Below is a description of the available function. For more details, visit the [GIRTH homepage](https://eribean.github.io/girth/).  
+This is a Python program for estimating Item Response Theory (IRT) parameters for a Rasch model (1PL). For synthetic IRT data generation, the [GIRTH](https://eribean.github.io/girth/) package can be used. Additionally, the program's structure and parameters are compatible with the [GIRTH](https://eribean.github.io/girth/) package. 
+
+# Proposed method
+
+### Step 1: Computation of Item Facility and Item Difficulty
+For each tesxt item $i$:
+
+1. Compute *Item Facility* ($F_i$):
+
+   $F_i = \frac{\text{number of correct responses to item } i}{\text{total responses to item } i}$
+  
+   This represents the proportion of test-takers who answered item $i$ correctly.
+
+2. Compute \textit{Item Difficulty} ($D_i$) as:
+
+   $D_i = 1 - F_i$
+  
+   This transformation ensures that items with higher facility (easier items) receive lower difficulty scores and items with lower facility (harder items) receive higher difficulty scores.
+
+### Step 2: Computation of Test-Taker Ability
+
+For each test-taker $j$:
+
+1. Sum the **difficulties of correctly answered items**:
+
+   $S_{\text{correct}, j} = \sum_{i \in C_j} D_i,$
+   
+   where $C_j$ is the set of items correctly answered by subject $j$.
+
+3. Sum the **facilities of incorrectly answered items**:
+
+   $S_{\text{incorrect}, j} = \sum_{i \in I_j} F_i$
+
+   where $I_j$ is the set of items incorrectly answered by subject $j$.
+
+4. Compute **Subject Ability** ($A_j$) as:
+
+   $A_j = \frac{S_{\text{correct}, j}}{S_{\text{correct}, j} + S_{\text{incorrect}, j}}$
+
+   In our practical implementations, any potential undefined $ 0/0 $ division when computing $A_j$ is addressed by assigning a default value of 0.5, ensuring computational stability.
 
 # Usage
 
