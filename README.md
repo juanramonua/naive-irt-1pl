@@ -13,7 +13,7 @@ To run Naïve IRT with unidimensional models (1PL).
 ```python
 import numpy as np
 from girth.synthetic import create_synthetic_irt_dichotomous
-from naive-irt import naive-irt-1pl
+from naive_irt import naive_irt_1pl
 
 # Create Synthetic Data
 difficulty = np.linspace(-2.5, 2.5, 10)
@@ -23,10 +23,10 @@ theta = np.random.randn(500)
 syn_data = create_synthetic_irt_dichotomous(difficulty, discrimination, theta)
 
 # Solve for parameters
-estimates = naive-irt-1pl(syn_data)
+estimates = naive_irt_1pl(syn_data)
 
 # Unpack estimates
-discrimination_estimates = estimates['Discrimination']
+ability_estimates = estimates['Ability']
 difficulty_estimates = estimates['Difficulty']
 ```
 
@@ -36,7 +36,7 @@ Missing data is supported using with the `tag_missing_data` function of `GIRTH` 
 
 ```python
 from girth import tag_missing_data
-from naive-irt import naive-irt-1pl
+from naive_irt import naive_irt_1pl
 
 # import data (you supply this function)
 my_data = import_data(filename)
@@ -45,18 +45,12 @@ my_data = import_data(filename)
 tagged_data = tag_missing_data(my_data, [0, 1])
 
 # Run Estimation
-results = naive-irt-1pl(tagged_data)
+results = naive_irt_1pl(tagged_data)
 ```
 
 # Support
 
 ## Installation
-
-Via pip
-
-```sh
-pip install girth --upgrade
-```
 
 From Source
 
