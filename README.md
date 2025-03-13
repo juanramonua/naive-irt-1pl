@@ -15,7 +15,7 @@ For each tesxt item $i$:
   
    This represents the proportion of test-takers who answered item $i$ correctly.
 
-2. Compute \textit{Item Difficulty} ($D_i$) as:
+2. Compute *Item Difficulty* ($D_i$) as:
 
    $D_i = 1 - F_i$
   
@@ -25,19 +25,19 @@ For each tesxt item $i$:
 
 For each test-taker $j$:
 
-1. Sum the **difficulties of correctly answered items**:
+1. Sum the *difficulties of correctly answered items*:
 
    $S_{\text{correct}, j} = \sum_{i \in C_j} D_i,$
    
    where $C_j$ is the set of items correctly answered by subject $j$.
 
-3. Sum the **facilities of incorrectly answered items**:
+3. Sum the *facilities of incorrectly answered items*:
 
    $S_{\text{incorrect}, j} = \sum_{i \in I_j} F_i$
 
    where $I_j$ is the set of items incorrectly answered by subject $j$.
 
-4. Compute **Subject Ability** ($A_j$) as:
+4. Compute *Subject Ability* ($A_j$) as:
 
    $A_j = \frac{S_{\text{correct}, j}}{S_{\text{correct}, j} + S_{\text{incorrect}, j}}$
 
