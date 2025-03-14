@@ -7,60 +7,85 @@ def naive_irt_1pl(dataset):
     """Estimates naive difficulty and ability parameters using a simplified 1PL IRT model (Rasch).
 
     Args:
-        dataset: [items x participants] matrix of True/False Values (0 or 1)
-         - 1: correct response
-         - 0: incorrect response
-         - Any other value is treated as unanswered (NaN).
+        dataset (np.ndarray): [items x participants] matrix of binary responses:
+            - 1: Correct response
+            - 0: Incorrect response
+            - Any other value is treated as unanswered (ignored)
 
     Returns:
         dict: Dictionary with two keys:
-            - 'Difficulty': (1d array) item difficulties, defined as 1 - Facility.
-            - 'Ability': (1d array) participant abilities, defined as the sum of difficulties
-              of correctly answered items divided by the sum of those difficulties plus the
-              sum of facilities of incorrectly answered items. Assigns 0.5 in case of division by zero.
+            - 'Difficulty': (1d array) Item difficulty parameters (1 - Facility)
+            - 'Ability': (1d array) Participant ability estimates calculated as:
+                (sum of item difficulties for correct answers) / 
+                (sum of difficulties + facilities for incorrect answers)
+                0.5 is used when denominator is zero.
+
+    Notes:
+        - Excludes invalid responses (non-0/1 values) from all calculations
+        - Ability estimates are constrained between 0 and 1
     """
-    # Convert invalid responses (neither 0 nor 1) to np.nan
-    X_valid = np.where((dataset == 0) | (dataset == 1), dataset, np.nan)
+    
+    # === Response Filtering ===
+    # Create boolean mask to identify valid responses (0 or 1)
+    mask = (dataset == 0) | (dataset == 1)
+    
+    # Get matrix dimensions
+    n_items, n_participants = dataset.shape
 
-    # Count correct and incorrect responses per item (rows)
-    # Note: (np.nan == 1) and (np.nan == 0) are False, so they are excluded from counts
-    sum_1 = np.sum(X_valid == 1, axis=1)
-    sum_0 = np.sum(X_valid == 0, axis=1)
-
-    # Compute facility: proportion of correct responses per item
-    total = sum_1 + sum_0
-    # Avoid division by zero by assigning np.nan when total == 0
-    facility = np.divide(sum_1, total, out=np.full_like(sum_1, np.nan, dtype=float), where=(total != 0))
-    # Item difficulty: 1 - Facility
+    # === Item Parameter Estimation ===
+    # Calculate correct responses per item (ignoring invalid entries)
+    sum_1 = np.sum((dataset == 1) & mask, axis=1)
+    
+    # Total valid responses per item (0/1 responses)
+    total_responses = np.sum(mask, axis=1, dtype=float)
+    
+    # Compute item facility (proportion of correct responses)
+    # Handles division by zero using out parameter
+    facility = np.divide(
+        sum_1, 
+        total_responses,
+        out=np.zeros_like(sum_1, dtype=float), 
+        where=total_responses != 0
+    )
+    
+    # Difficulty is inverse of facility
     difficulty = 1 - facility
 
-    # For each participant (columns):
-    # - Accumulate difficulty for correct responses
-    # - Accumulate facility for incorrect responses
-    # Use boolean masks and broadcasting for vectorized computation
-    mask_correct = (X_valid == 1)
-    mask_incorrect = (X_valid == 0)
+    # === Participant Ability Estimation ===
+    # Calculate weighted sums for ability estimation
+    # Use element-wise multiplication with mask to exclude invalid responses
+    
+    # Sum of item difficulties for correct answers per participant
+    sum1_part = np.sum(
+        (dataset == 1) * mask * difficulty[:, np.newaxis],
+        axis=0
+    )
+    
+    # Sum of item facilities for incorrect answers per participant
+    sum0_part = np.sum(
+        (dataset == 0) * mask * facility[:, np.newaxis],
+        axis=0
+    )
+    
+    # Compute denominator for ability calculation
+    denominator = sum1_part + sum0_part
+    
+    # Ability calculation with default 0.5 for undefined cases
+    ability = np.divide(
+        sum1_part,
+        denominator,
+        out=np.full_like(denominator, 0.5, dtype=float),
+        where=denominator != 0
+    )
 
-    # Expand difficulty and facility vectors for matrix multiplication
-    # Original shape (n_items,) becomes (n_items, 1)
-    diff_matrix = difficulty[:, np.newaxis]
-    fac_matrix = facility[:, np.newaxis]
-
-    # Sum difficulties for correct responses per participant
-    ability_sum1 = np.nansum(mask_correct * diff_matrix, axis=0)
-    # Sum facilities for incorrect responses per participant
-    ability_sum0 = np.nansum(mask_incorrect * fac_matrix, axis=0)
-
-    # Compute ability, assigning 0.5 where denominator is zero
-    total_part = ability_sum1 + ability_sum0
-    ability = np.where(total_part == 0, 0.5, ability_sum1 / total_part)
-
-    return {'Difficulty': difficulty, 'Ability': ability}
+    return {'Difficulty': difficulty,'Ability': ability}  
+  
 
 
 if __name__ == "__main__":
     # Example usage
     sample_data = np.array([[1, 0, 1], [0, 1, 0], [1, 1, 0]])
-    result = naive_irt_1p(sample_data)
+    result = naive_irt_1pl(sample_data)
     print("Item Difficulties:", result['Difficulty'])
     print("Participant Abilities:", result['Ability'])
+    
