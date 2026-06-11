@@ -4,7 +4,13 @@ __all__ = ["naive_irt_1pl"]
 
 
 def naive_irt_1pl(dataset):
-    """Estimates naive difficulty and ability parameters using a simplified 1PL IRT model (Rasch).
+    """
+    D-CTT: Deterministic Classical Test Theory
+
+    Estimates item difficulty and examinee ability parameters using a deterministic,
+    non-iterative heuristic derived from Classical Test Theory principles. The method
+    is designed as a high-performance alternative to the 1PL Item Response Theory
+    (Rasch) model while maintaining full algorithmic traceability and interpretability.
 
     Args:
         dataset (np.ndarray): [items x participants] matrix of binary responses:
