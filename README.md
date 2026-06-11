@@ -1,6 +1,6 @@
-# Naïve IRT (1PL)
+# D-CTT: Deterministic Classical Test Theory
 
-Naïve IRT: A Speed-Optimized and Accurate Alternative to the Rasch Model  
+D-CTT: A Speed-Optimized and Accurate Alternative to the Rasch Model  
 
 This is a Python program for estimating Item Response Theory (IRT) parameters for a Rasch model (1PL). For synthetic IRT data generation, the [GIRTH](https://eribean.github.io/girth/) package can be used. Additionally, the program's structure and parameters are compatible with the [GIRTH](https://eribean.github.io/girth/) package. 
 
@@ -45,7 +45,7 @@ For each test-taker $j$:
 
 # Usage
 
-To run Naïve IRT with unidimensional models (1PL).
+To run D-CTT with the unidimensional (1PL) models implemented in `naive_irt`:
 
 ### Complete Data
 
